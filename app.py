@@ -116,7 +116,6 @@ def main(str_data):
                 # Преобразование списка имен столбцов в CSV-строку
                 output = io.StringIO()
                 writer = csv.writer(output)
-                writer.writerow(['column'])
                 for col in result:
                     writer.writerow([col])
                 return output.getvalue()

@@ -11,7 +11,6 @@ class TestMainFunction(TestCase):
         Вспомогательная функция для парсинга CSV-строки в список.
         """
         reader = csv.reader(io.StringIO(csv_str))
-        next(reader)  # Пропустить заголовок
         return [row[0] for row in reader]
 
     def test_simple_key(self):
