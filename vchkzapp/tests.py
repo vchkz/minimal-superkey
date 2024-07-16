@@ -14,41 +14,52 @@ class TestMainFunction(TestCase):
         next(reader)  # Пропустить заголовок
         return [row[0] for row in reader]
 
-    def test_unique_identification(self):
+    def test_simple_key(self):
         json_str = '''
         [
-            {"id": 1, "name": "Alice", "age": 30, "city": "New York"},
-            {"id": 2, "name": "Bob", "age": 25, "city": "New York"},
-            {"id": 3, "name": "Alice", "age": 30, "city": "San Francisco"}
+            {"id": 1, "name": "Sam", "age": 20, "city": "York"},
+            {"id": 2, "name": "Sam", "age": 20, "city": "York"},
+            {"id": 3, "name": "Sam", "age": 20, "city": "York"}
         ]
         '''
         result = main(json_str)
         parsed_result = self.parse_csv(result)
         self.assertEqual(parsed_result, ["id"])
 
-    def test_no_duplicates(self):
-        json_str = '''
-        [
-            {"name": "Alice", "age": 30, "city": "New York"},
-            {"name": "Bob", "age": 35, "city": "New York"},
-            {"name": "Charlie", "age": 35, "city": "Chicago"}
-        ]
-        '''
-        result = main(json_str)
-        parsed_result = self.parse_csv(result)
-        self.assertEqual(parsed_result, ["name"])
-
     def test_with_duplicates(self):
         json_str = '''
         [
-            {"id": 1, "name": "Alice", "age": 30, "city": "New York"},
-            {"id": 1, "name": "Alice", "age": 30, "city": "Los Angeles"},
-            {"id": 1, "name": "Bob", "age": 30, "city": "Los Angeles"}
+            {"name": "Sam", "age": 30, "city": "York"},
+            {"name": "Bob", "age": 30, "city": "York"},
+            {"name": "Sam", "age": 0, "city": "York"}
         ]
         '''
         result = main(json_str)
         parsed_result = self.parse_csv(result)
-        self.assertEqual(sorted(parsed_result), sorted(["name", "city"]))
+        self.assertEqual(sorted(parsed_result), sorted(["name", "age"]))
+
+    def test_with_all_duplicates(self):
+        json_str = '''
+        [
+            {"name": "Sam", "age": 30, "city": "York"},
+            {"name": "Sam", "age": 30, "city": "New York"},
+            {"name": "Sam", "age": 31, "city": "York"},
+            {"name": "Bob", "age": 30, "city": "York"}
+        ]
+        '''
+        result = main(json_str)
+        parsed_result = self.parse_csv(result)
+        self.assertEqual(sorted(parsed_result), sorted(["name", "age", "city"]))
+
+    # def test_one_row(self):
+    #     json_str = '''
+    #     [
+    #         {"name": "Sam", "age": 30, "city": "York"}
+    #     ]
+    #     '''
+    #     result = main(json_str)
+    #     parsed_result = self.parse_csv(result)
+    #     self.assertIn(parsed_result, ["name", "age", "city"])
 
     def test_minimal_columns(self):
         json_str = '''
@@ -75,3 +86,16 @@ class TestMainFunction(TestCase):
         result = main(json_str)
         parsed_result = self.parse_csv(result)
         self.assertEqual(sorted(parsed_result), sorted(["profession", "city"]))
+
+    def test_missing_using_value(self):
+        json_str = '''
+        [
+            {"name": "Alice", "age": 30, "city": "New York", "profession": "Engineer"},
+            {"name": "Alice", "city": "New York", "profession": "Doctor"},
+            {"name": "Alice", "age": 32, "city": "New York", "profession": "Artist"},
+            {"name": "Alice", "age": 33, "city": "New York", "profession": "Doctor"}
+        ]
+        '''
+        result = main(json_str)
+        parsed_result = self.parse_csv(result)
+        self.assertEqual(sorted(parsed_result), sorted(["age"]))
