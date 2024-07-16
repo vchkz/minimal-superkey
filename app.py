@@ -1,6 +1,7 @@
 import json
+import csv
+import io
 from itertools import combinations
-
 
 def get_columns(data):
     """
@@ -15,7 +16,6 @@ def get_columns(data):
     for row in data:
         columns.update(row.keys())
     return list(columns)
-
 
 def is_duplicates(data, columns):
     """
@@ -39,7 +39,6 @@ def is_duplicates(data, columns):
         i += 1
     return False
 
-
 def column_unique_counts(data, columns):
     """
     Вычисляет количество уникальных значений для каждого столбца в наборе данных.
@@ -59,12 +58,11 @@ def column_unique_counts(data, columns):
         j = 0
         while j < len(data):
             row = data[j]
-            unique_values.add(row[column])
+            unique_values.add(row.get(column, None))
             j += 1
         unique_counts[column] = len(unique_values)
         i += 1
     return unique_counts
-
 
 def main(str_data):
     """
@@ -114,9 +112,16 @@ def main(str_data):
         while subset is not None:
             subset_columns = list(subset) + necessary_cols
             if not is_duplicates(data, subset_columns):
-                return subset_columns
+                result = subset_columns
+                # Преобразование списка имен столбцов в CSV-строку
+                output = io.StringIO()
+                writer = csv.writer(output)
+                writer.writerow(['column'])
+                for col in result:
+                    writer.writerow([col])
+                return output.getvalue()
             subset = next(comb, None)
         r += 1
 
-    # Возврат пустого списка, если уникальный набор не найден
-    return []
+    # если уникальный набор не найден
+    return ""
