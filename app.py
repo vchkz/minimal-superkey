@@ -3,6 +3,7 @@ import csv
 import io
 from itertools import combinations
 
+
 def get_columns(data):
     """
     Извлекает список имен столбцов из набора данных.
@@ -16,6 +17,7 @@ def get_columns(data):
     for row in data:
         columns.update(row.keys())
     return list(columns)
+
 
 def is_duplicates(data, columns):
     """
@@ -38,6 +40,7 @@ def is_duplicates(data, columns):
         seen.add(row_tuple)
         i += 1
     return False
+
 
 def column_unique_counts(data, columns):
     """
@@ -63,6 +66,7 @@ def column_unique_counts(data, columns):
         unique_counts[column] = len(unique_values)
         i += 1
     return unique_counts
+
 
 def main(str_data):
     """
