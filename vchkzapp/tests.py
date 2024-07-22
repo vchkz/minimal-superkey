@@ -50,16 +50,6 @@ class TestMainFunction(TestCase):
         parsed_result = self.parse_csv(result)
         self.assertEqual(sorted(parsed_result), sorted(["name", "age", "city"]))
 
-    # def test_one_row(self):
-    #     json_str = '''
-    #     [
-    #         {"name": "Sam", "age": 30, "city": "York"}
-    #     ]
-    #     '''
-    #     result = main(json_str)
-    #     parsed_result = self.parse_csv(result)
-    #     self.assertIn(parsed_result, ["name", "age", "city"])
-
     def test_minimal_columns(self):
         json_str = '''
         [
@@ -98,3 +88,15 @@ class TestMainFunction(TestCase):
         result = main(json_str)
         parsed_result = self.parse_csv(result)
         self.assertEqual(sorted(parsed_result), sorted(["age"]))
+
+    def test_large_file(self):
+        """
+        Тест для большого файла data.json.
+        """
+        with open('test_data.json', 'r', encoding='utf-8') as file:
+            json_str = file.read()
+
+        result = main(json_str)
+        parsed_result = self.parse_csv(result)
+
+        self.assertEqual(sorted(parsed_result), sorted(["фамилия", "подгруппа", "предмет", "видДеятельности", "класс"]))
